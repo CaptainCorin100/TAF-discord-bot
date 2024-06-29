@@ -25,9 +25,9 @@ scenes_register_message : Message = None
 #Return a register of all scene names and their current scene numbers
 def display_register() -> str:
     scene_names = list(map(lambda x: x.name, scene_channels))
-    display_text = ""
+    display_text = "# Current Scene Numbers: \n"
     for i in range(len(scene_names)):
-        display_text += f"{scene_names[i]}: {scene_counts[i]} \n"
+        display_text += f"**{scene_names[i]}**: Scene **{scene_counts[i]}** \n"
     
     return display_text
 
