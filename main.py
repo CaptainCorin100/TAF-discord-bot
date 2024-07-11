@@ -45,38 +45,71 @@ async def on_ready() -> None:
 
 
 #Tick over a scene in a channel to the next one
-@bot.hybrid_command()
+@bot.hybrid_command(name="scene", description="Start a new Scene in this channel")
 async def scene(ctx: commands.Context):
-    sceneNo = 1
-    sceneIndex = 0
-    if ctx.channel in scene_channels:
-        sceneIndex = scene_channels.index(ctx.channel)
-        scene_counts[sceneIndex] += 1
-        sceneNo = scene_counts[sceneIndex]
-        await scene_messages[sceneIndex].unpin()
+    crew = ctx.guild.get_role(1259434112784007292)
+    gm = ctx.guild.get_role(1259434112784007293)
+    if crew in ctx.author.roles or gm in ctx.author.roles:
+        sceneNo = 1
+        sceneIndex = 0
+        if ctx.channel in scene_channels:
+            sceneIndex = scene_channels.index(ctx.channel)
+            scene_counts[sceneIndex] += 1
+            sceneNo = scene_counts[sceneIndex]
+            await scene_messages[sceneIndex].unpin()
+        else:
+            scene_channels.append(ctx.channel)
+            scene_counts.append(1)
+            scene_messages.append(ctx.message)
+            sceneIndex = len(scene_counts) - 1
+        
+        scene_messages[sceneIndex] = await ctx.send(f"# Scene {sceneNo}")
+        await scene_messages[sceneIndex].pin()
+        await refresh_register()
     else:
-        scene_channels.append(ctx.channel)
-        scene_counts.append(1)
-        scene_messages.append(ctx.message)
-        sceneIndex = len(scene_counts) - 1
-    
-    scene_messages[sceneIndex] = await ctx.send(f"# Scene {sceneNo}")
-    await scene_messages[sceneIndex].pin()
-    await refresh_register()
+        await ctx.send("You do not have the permissions to do that!")
+
+@bot.hybrid_command(name="get_help", description="Request for help, adjudication, or clarification")
+async def get_help(ctx: commands.Context, message: str):
+    crew_channel = await bot.fetch_channel(1259434115875213323) # replace with crew channel ID
+    at_user = ctx.author.mention
+    crew = ctx.guild.get_role(1259434112784007292)  # replace with actual crew role ID in live server
+    at_crew = crew.mention
+    await ctx.reply(
+        f"Your response has been sent to the game team, {at_user}. "
+        f"The game team are checking and will get back to you soon. "
+        f"\nThe message you sent: \n> _{message}_"
+    )
+    await crew_channel.send(
+        f"{at_crew} you got a request from username '**{ctx.author.name}**', "
+        f"server nickname at time of sending '**{ctx.author.nick}**'. "
+        f"\nMessage sent from: {ctx.channel.jump_url}"
+        f"\nMessage sent: \n> _{message}_"
+    ) 
 
 #Create a scene register in a specified channel
-@bot.hybrid_command()
+@bot.hybrid_command(name="create_scene_register", description="Create a Scene register in this channel")
 async def create_scene_register (ctx: commands.Context):
-    global scenes_register_message
-    scenes_register_message = await ctx.send (display_register())
-    print (scenes_register_message)
+    crew = ctx.guild.get_role(1259434112784007292)
+    gm = ctx.guild.get_role(1259434112784007293)
+    if crew in ctx.author.roles or gm in ctx.author.roles:
+        global scenes_register_message
+        scenes_register_message = await ctx.send (display_register())
+        print (scenes_register_message)
+    else:
+        await ctx.send("You do not have the permissions to do that!")
 
 #Run conflict between two mentioned names (as strings, this could possibly be changed to enforce them as users? That might be helpful as a TODO if you want to add conflict validation)
-@bot.hybrid_command()
+@bot.hybrid_command(name="run_conflict", description="Run a conflict between person 1 and person 2")
 async def run_conflict (ctx: commands.Context, person1: str, person2: str) -> None:
     combatants = [person1, person2]
     victory_int = randint(0,1)
     await ctx.send(f"**{combatants[victory_int]}** won the conflict against **{combatants[1-victory_int]}**")
+
+@bot.hybrid_command(name="use_charge", description="Flips a coin to test whether you run out of charges")
+async def use_charge (ctx: commands.Context) -> None:
+    outcome = ["You've run out of charges on this!", "You've still got charges left!"]
+    await ctx.send (outcome[randint(0,1)])
 
 #Main function
 def main() -> None:
