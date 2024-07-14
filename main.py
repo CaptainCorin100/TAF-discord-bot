@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, app_commands
 from discord.ext import commands
-from random import randint
+from random import randint, random
 
 #Load token from .env file
 load_dotenv()
@@ -110,6 +110,22 @@ async def run_conflict (ctx: commands.Context, person1: str, person2: str) -> No
 async def use_charge (ctx: commands.Context) -> None:
     outcome = ["You've run out of charges on this!", "You've still got charges left!"]
     await ctx.send (outcome[randint(0,1)])
+
+@bot.hybrid_command(name="bombonomicon", description="Bombonomicon.")
+async def use_charge (ctx: commands.Context, target:str) -> None:
+    if ctx.author.id == 315019410337300483:
+        outcome = [f"The Bombonomicon explodes **{target}**!", "The Bombonomicon explodes **Bimbrundo** himself!"]
+        await ctx.send (outcome[randint(0,1)])
+    else:
+        await ctx.send ("You don't own that Item!")
+
+@bot.hybrid_command(name="disintegrate", description="Disintegrating pistol.")
+async def use_charge (ctx: commands.Context) -> None:
+    if ctx.author.id == 723282487157063801:
+        outcome = "The disintegrating ray is ready to fire!" if random() < 0.75 else "The disintegrating ray has disintegrated!"
+        await ctx.send (outcome)
+    else:
+        await ctx.send ("You don't own that Item!")
 
 #Main function
 def main() -> None:
