@@ -111,7 +111,7 @@ async def use_charge (ctx: commands.Context) -> None:
     outcome = ["You've run out of charges on this!", "You've still got charges left!"]
     await ctx.send (outcome[randint(0,1)])
 
-@bot.hybrid_command(name="bombonomicon", description="Bombonomicon.")
+@bot.hybrid_command(name="bombonomicon", description="Bombonomicon")
 async def use_charge (ctx: commands.Context, target:str) -> None:
     if ctx.author.id == 315019410337300483:
         outcome = [f"The Bombonomicon explodes **{target}**!", "The Bombonomicon explodes **Bimbrundo** himself!"]
@@ -119,13 +119,33 @@ async def use_charge (ctx: commands.Context, target:str) -> None:
     else:
         await ctx.send ("You don't own that Item!")
 
-@bot.hybrid_command(name="disintegrate", description="Disintegrating pistol.")
+@bot.hybrid_command(name="disintegrate", description="Disintegrating pistol")
 async def use_charge (ctx: commands.Context) -> None:
     if ctx.author.id == 723282487157063801:
         outcome = "The disintegrating ray is ready to fire!" if random() < 0.75 else "The disintegrating ray has disintegrated!"
         await ctx.send (outcome)
     else:
         await ctx.send ("You don't own that Item!")
+
+@bot.hybrid_command(name="craft_request", description="Request to do crafting")
+async def craft_request(ctx: commands.Context, components: str, craft_plan: str):
+    crew_channel = await bot.fetch_channel(1259434115875213324)
+    at_user = ctx.author.mention
+    gm_role = ctx.guild.get_role(1259434112784007293)
+    at_gm = gm_role.mention
+    await ctx.reply(
+        f"Your response has been sent to the game team, {at_user}. "
+        f"The game team are checking and will get back to you soon. "
+        f"\nComponent(s) listed: _{components}_"
+        f"\nThe crafting plan sent: \n> _{craft_plan}_"
+    )
+    await crew_channel.send(
+        f"{at_gm} you got a request from username '**{ctx.author.name}**', "
+        f"server nickname at time of sending '**{ctx.author.nick}**'. "
+        f"\nMessage sent from: {ctx.channel.jump_url}"
+        f"\nComponent(s) listed: _{components}_"
+        f"\nCrafting plan sent: \n> _{craft_plan}_"
+    )
 
 #Main function
 def main() -> None:
