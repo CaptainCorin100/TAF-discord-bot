@@ -122,10 +122,19 @@ async def use_charge (ctx: commands.Context, target:str) -> None:
 @bot.hybrid_command(name="disintegrate", description="Disintegrating pistol")
 async def use_charge (ctx: commands.Context) -> None:
     if ctx.author.id == 723282487157063801:
-        outcome = "The disintegrating ray is ready to fire!" if random() < 0.75 else "The disintegrating ray has disintegrated!"
+        randomval = random()
+        print(randomval)
+        outcome = "The disintegrating ray is ready to fire!" if randomval < 0.75 else "The disintegrating ray has disintegrated!"
         await ctx.send (outcome)
     else:
         await ctx.send ("You don't own that Item!")
+
+@bot.hybrid_command(name="gamble", description="Roll the dice")
+async def use_charge (ctx: commands.Context) -> None:
+    randomval = randint(1,38)
+    print(randomval)
+    outcome = f"The roulette wheel has come up with **{randomval}** (out of 38)."
+    await ctx.send (outcome)
 
 @bot.hybrid_command(name="craft_request", description="Request to do crafting")
 async def craft_request(ctx: commands.Context, components: str, craft_plan: str):
