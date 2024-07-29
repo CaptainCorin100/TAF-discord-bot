@@ -141,7 +141,13 @@ async def use_charge (ctx: commands.Context, rigged: bool) -> None:
     randomval = randint(1,38) if not rigged else randint(1,1000)
     print(randomval)
     outcome = f"The roulette wheel has come up with **{randomval}** (out of 38)."
-    await ctx.send (outcome)
+
+    roulette_msg = await ctx.send(f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
+    time.sleep(0.2)
+    for i in range(0,8):
+        await roulette_msg.edit(content=f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
+        time.sleep(0.2)
+    await roulette_msg.edit(content=outcome)
 
 @bot.hybrid_command(name="craft_request", description="Request to do crafting")
 async def craft_request(ctx: commands.Context, components: str, craft_plan: str):
