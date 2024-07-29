@@ -39,6 +39,7 @@ async def refresh_register () -> None:
     if scenes_register_message != None:
         try:
             await scenes_register_message.edit(content=display_register())
+            #await scenes_register_message.delete()
         except Exception:
             correct_channel = scenes_register_message.channel
             await scenes_register_message.delete()
@@ -101,7 +102,8 @@ async def create_scene_register (ctx: commands.Context):
     gm = ctx.guild.get_role(1259434112784007293)
     if crew in ctx.author.roles or gm in ctx.author.roles:
         global scenes_register_message
-        scenes_register_message = await ctx.send (display_register())
+        scenes_register_message = await ctx.channel.send(display_register())
+        await ctx.send("Register Displayed")
         print (scenes_register_message)
     else:
         await ctx.send("You do not have the permissions to do that!")
