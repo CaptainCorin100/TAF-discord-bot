@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from discord import Intents, Client, Message, app_commands
 from discord.ext import commands
 from random import randint, random
+import time
 
 #Load token from .env file
 load_dotenv()
@@ -33,10 +34,16 @@ def display_register() -> str:
 
 #Edit previously sent register message
 async def refresh_register () -> None:
+    global scenes_register_message
     print (scenes_register_message)
     if scenes_register_message != None:
-        await scenes_register_message.edit(content=display_register())
-
+        try:
+            await scenes_register_message.edit(content=display_register())
+        except Exception:
+            correct_channel = scenes_register_message.channel
+            await scenes_register_message.delete()
+            scenes_register_message = await correct_channel.send(display_register())
+            
 #Sync commands when bot run
 @bot.event
 async def on_ready() -> None:
@@ -130,8 +137,8 @@ async def use_charge (ctx: commands.Context) -> None:
         await ctx.send ("You don't own that Item!")
 
 @bot.hybrid_command(name="gamble", description="Roll the dice")
-async def use_charge (ctx: commands.Context) -> None:
-    randomval = randint(1,38)
+async def use_charge (ctx: commands.Context, rigged: bool) -> None:
+    randomval = randint(1,38) if not rigged else randint(1,1000)
     print(randomval)
     outcome = f"The roulette wheel has come up with **{randomval}** (out of 38)."
     await ctx.send (outcome)
