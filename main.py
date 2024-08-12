@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord import Intents, Client, Message, app_commands
 from discord.ext import commands
-from random import randint, random
+from random import randint, random, choice
 import time
 
 #Load token from .env file
@@ -22,6 +22,8 @@ scene_channels = []
 scene_messages = []
 scenes_register_message : Message = None
 
+card_vals = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"]
+card_suits = ["Hearts", "Spades", "Clubs", "Diamonds"]
 
 #Return a register of all scene names and their current scene numbers
 def display_register() -> str:
@@ -50,6 +52,8 @@ async def refresh_register () -> None:
 async def on_ready() -> None:
     print (f'{bot.user} is now running!')
     await bot.tree.sync()
+
+
 
 
 #Tick over a scene in a channel to the next one
@@ -120,8 +124,11 @@ async def use_charge (ctx: commands.Context) -> None:
     outcome = ["You've run out of charges on this!", "You've still got charges left!"]
     await ctx.send (outcome[randint(0,1)])
 
+
+
+
 @bot.hybrid_command(name="bombonomicon", description="Bombonomicon")
-async def use_charge (ctx: commands.Context, target:str) -> None:
+async def throw_bomb (ctx: commands.Context, target:str) -> None:
     if ctx.author.id == 315019410337300483:
         outcome = [f"The Bombonomicon explodes **{target}**!", "The Bombonomicon explodes **Bimbrundo** himself!"]
         await ctx.send (outcome[randint(0,1)])
@@ -129,7 +136,7 @@ async def use_charge (ctx: commands.Context, target:str) -> None:
         await ctx.send ("You don't own that Item!")
 
 @bot.hybrid_command(name="disintegrate", description="Disintegrating pistol")
-async def use_charge (ctx: commands.Context) -> None:
+async def disintegrate (ctx: commands.Context) -> None:
     if ctx.author.id == 723282487157063801:
         randomval = random()
         print(randomval)
@@ -138,8 +145,11 @@ async def use_charge (ctx: commands.Context) -> None:
     else:
         await ctx.send ("You don't own that Item!")
 
+
+
+
 @bot.hybrid_command(name="gamble", description="Roll the dice")
-async def use_charge (ctx: commands.Context, rigged: bool) -> None:
+async def gamble (ctx: commands.Context, rigged: bool) -> None:
     randomval = randint(1,38) if not rigged else randint(1,1000)
     print(randomval)
     outcome = f"The roulette wheel has come up with **{randomval}** (out of 38)."
@@ -150,6 +160,27 @@ async def use_charge (ctx: commands.Context, rigged: bool) -> None:
         await roulette_msg.edit(content=f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
         time.sleep(0.2)
     await roulette_msg.edit(content=outcome)
+
+@bot.hybrid_command(name="fixed_roulette", description="Roll the dice (it's definitely not rigged)")
+async def gamble_determined (ctx: commands.Context, rigged_num: int) -> None:
+    outcome = f"The roulette wheel has come up with **{rigged_num}** (out of 38)."
+
+    roulette_msg = await ctx.send(f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
+    time.sleep(0.2)
+    for i in range(0,8):
+        await roulette_msg.edit(content=f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
+        time.sleep(0.2)
+    await roulette_msg.edit(content=outcome)
+
+@bot.hybrid_command(name="draw_card", description="Draw a card from a deck")
+async def gamble_determined (ctx: commands.Context, spoilered: bool) -> None:
+    decision = choice(card_vals) + " of " + choice(card_suits)
+    if spoilered:
+        decision = "||" + decision + "||"
+    outcome = f"Your card is the **{decision}**."
+
+    await ctx.send(outcome)
+
 
 @bot.hybrid_command(name="craft_request", description="Request to do crafting")
 async def craft_request(ctx: commands.Context, components: str, craft_plan: str):
