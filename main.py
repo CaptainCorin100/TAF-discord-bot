@@ -24,6 +24,7 @@ scenes_register_message : Message = None
 
 card_vals = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"]
 card_suits = ["Hearts", "Spades", "Clubs", "Diamonds"]
+card_decks = {}
 
 #Return a register of all scene names and their current scene numbers
 def display_register() -> str:
@@ -173,13 +174,40 @@ async def gamble_determined (ctx: commands.Context, rigged_num: int) -> None:
     await roulette_msg.edit(content=outcome)
 
 @bot.hybrid_command(name="draw_card", description="Draw a card from a deck")
-async def gamble_determined (ctx: commands.Context, spoilered: bool) -> None:
-    decision = choice(card_vals) + " of " + choice(card_suits)
-    if spoilered:
-        decision = "||" + decision + "||"
-    outcome = f"Your card is the **{decision}**."
+async def draw_card (ctx: commands.Context, deck_name: str, spoilered: bool) -> None:
+    global card_decks
+    deck_lower = deck_name.lower()
 
-    await ctx.send(outcome)
+    if card_decks.get(deck_lower) == None:
+        fresh_deck = []
+        for suit in card_suits:
+            for val in card_vals:
+                fresh_deck.append(val + " of " + suit)
+        card_decks[deck_lower] = fresh_deck
+        ctx.channel.send(f"New deck {deck_name} created.")
+
+    if len(card_decks[deck_lower]) > 0:
+        decision = choice(card_decks[deck_lower])
+        card_decks[deck_lower].remove(decision)
+        print(decision)
+        
+        if spoilered:
+            decision = "||" + decision + "||"
+        
+        outcome = f"Your card (drawn from deck **{deck_lower}**) is the **{decision}**. ({len(card_decks[deck_lower])}/52 cards left in deck)"
+
+        await ctx.send(outcome)
+
+    else:
+        await ctx.send("No cards left in deck!")
+
+@bot.hybrid_command(name="shuffle_deck", description="Shuffles cards back into a deck")
+async def draw_card (ctx: commands.Context, deck_name: str) -> None:
+    if card_decks.get(deck_name.lower()) == None:
+        await ctx.send ("Deck does not exist!")
+    else: 
+        card_decks.pop(deck_name.lower())
+        await ctx.send(deck_name.lower() + " was shuffled!")
 
 
 @bot.hybrid_command(name="craft_request", description="Request to do crafting")
