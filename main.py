@@ -184,7 +184,7 @@ async def draw_card (ctx: commands.Context, deck_name: str, spoilered: bool) -> 
             for val in card_vals:
                 fresh_deck.append(val + " of " + suit)
         card_decks[deck_lower] = fresh_deck
-        ctx.channel.send(f"New deck {deck_name} created.")
+        await ctx.channel.send(f"New deck {deck_name} created.")
 
     if len(card_decks[deck_lower]) > 0:
         decision = choice(card_decks[deck_lower])
