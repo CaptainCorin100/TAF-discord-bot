@@ -5,6 +5,7 @@ from discord import Intents, Client, Message, app_commands
 from discord.ext import commands
 from random import randint, random, choice
 import time
+import json
 
 #Load token from .env file
 load_dotenv()
@@ -25,6 +26,9 @@ scenes_register_message : Message = None
 card_vals = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"]
 card_suits = ["Hearts", "Spades", "Clubs", "Diamonds"]
 card_decks = {}
+
+english_words = open("english-words-only.min.json")
+english_words_data = json.load(english_words)
 
 #Return a register of all scene names and their current scene numbers
 def display_register() -> str:
@@ -159,6 +163,19 @@ async def gamble (ctx: commands.Context, rigged: bool) -> None:
     time.sleep(0.2)
     for i in range(0,8):
         await roulette_msg.edit(content=f"The roulette wheel is spinning... \n {randint(1,38)} out of 38")
+        time.sleep(0.2)
+    await roulette_msg.edit(content=outcome)
+
+@bot.hybrid_command(name="gamble_gender", description="Roll the dice (of gender)")
+async def gamble_gender (ctx: commands.Context) -> None:
+    randomval = choice(english_words_data)["text"]
+    print(randomval)
+    outcome = f"Your assigned gender is **{randomval}**."
+
+    roulette_msg = await ctx.send(f"The gender roulette wheel is spinning... \n {choice(english_words_data)["text"]}")
+    time.sleep(0.2)
+    for i in range(0,8):
+        await roulette_msg.edit(content=f"The gender roulette wheel is spinning... \n {choice(english_words_data)["text"]}")
         time.sleep(0.2)
     await roulette_msg.edit(content=outcome)
 
